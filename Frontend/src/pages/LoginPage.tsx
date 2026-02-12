@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
 
 export default function Login() {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -17,13 +18,13 @@ export default function Login() {
             {/* --- LEFT SIDE --- */}
             <div className="flex flex-col h-full">
                 <div className="flex h-20 px-4 py-4 shrink-0">
-                    <a href="#">
+                    <Link to="/">
                         <img
                             src="/Logo.png"
                             alt="Cứu Hộ Logo"
-                            className="w-auto h-12"
+                            className="w-auto h-12 cursor-pointer hover:opacity-90 transition-opacity"
                         />
-                    </a>
+                    </Link>
                 </div>
             
                 <div className="flex-1 flex justify-center w-full pt-24">
