@@ -1,4 +1,3 @@
-import React from 'react';
 import zaloIcon from '../assets/icon/zalo.png';
 import googleIcon from '../assets/icon/google.png';
 import facebookIcon from '../assets/icon/facebook.png';
@@ -6,7 +5,7 @@ import vector1 from '../assets/footerbg/Vector1.svg';
 import vector2 from '../assets/footerbg/Vector2.svg';
 import vector3 from '../assets/footerbg/Vector3.svg';
 
-const Footer: React.FC = () => {
+export default function Footer() {
   return (
     <footer className="relative w-full text-white overflow-hidden">
       <div className="absolute z-0"/>
@@ -114,6 +113,4 @@ const Footer: React.FC = () => {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

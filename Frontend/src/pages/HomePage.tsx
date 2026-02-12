@@ -17,12 +17,9 @@ import Footer from "@/layouts/Footer";
 
 export default function HomePage() {
     return (
-        <div className="w-full">
-            
-            <div
-                className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden pt-4 min-h-[520px] flex flex-col items-center justify-center"
-            >
-                <div className="relative w-full h-[600px] flex items-center justify-center">
+        <div className="w-full overflow-x-hidden"> 
+            <div>
+                <div className="relative w-full flex justify-center">
                     <img
                         src={banner}
                         alt="Cứu hộ"
@@ -38,7 +35,7 @@ export default function HomePage() {
             </div>
 
             {/* ===== VẤN ĐỀ THỰC TẾ ===== */}
-            <div className="px-50 py-20 ">
+            <div className="px-50 py-20">
                 <h2 className="mb-12 text-center text-2xl font-bold uppercase tracking-wide text-gray-800">
                     VẤN ĐỀ THỰC TẾ
                 </h2>
