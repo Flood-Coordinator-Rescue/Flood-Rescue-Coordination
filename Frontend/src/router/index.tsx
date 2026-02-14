@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
         path: ROUTES.REQUEST, 
         element: <RequestPage />,
       },
-    ],
+      {
         path: ROUTES.SEARCH, 
         element: <FindRequestPage />,
       },
