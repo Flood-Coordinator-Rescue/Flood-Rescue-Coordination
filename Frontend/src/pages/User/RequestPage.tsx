@@ -1,17 +1,18 @@
 import { Label } from "@/components/ui/label"
-import { useEffect, useRef, useMemo } from "react"
+import { useEffect, useRef, useMemo, useState } from "react"
 import {
   Empty,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import { Image, Locate } from "lucide-react"
+import { Image, Locate, MapPinned, Navigation } from "lucide-react"
 import vietmapgl from "@vietmap/vietmap-gl-js"
 import { useVietMap } from "@/lib/MapProvider"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { requestSchema, type RequestSchemaType } from "@/validations/user.request.schema"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 export default function RequestPage() {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -19,6 +20,7 @@ export default function RequestPage() {
   const markerRef = useRef<vietmapgl.Marker | null>(null)
 
   const { map, mount, unmount } = useVietMap()
+  const [activeTab, setActiveTab] = useState("address");
   const {
     register,
     handleSubmit,
@@ -37,7 +39,7 @@ export default function RequestPage() {
       phone: "",
       name: "",
       url: "",
-      image: null as any,
+      image: undefined,
     },
   })
   const selectedType = watch("type")
@@ -71,7 +73,6 @@ export default function RequestPage() {
     setValue("image", file, { shouldValidate: true })
   }
 
-  // ================= GEOLOCATION =================
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       alert("Trình duyệt không hỗ trợ định vị")
@@ -79,25 +80,39 @@ export default function RequestPage() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const lat = position.coords.latitude
         const lng = position.coords.longitude
-        // setValue("locate", `${lat.toFixed(6)}, ${lng.toFixed(6)}`, { shouldValidate: true }) ko cần phải tự điền form nữa vì sẽ convert địa chỉ ra tọa độ lun
+        setValue("locate", `${lat.toFixed(6)}, ${lng.toFixed(6)}`, { shouldValidate: true }) 
 
-        if (!map) return
-
-        map.flyTo({ center: [lng, lat], zoom: 15 })
-
-        if (markerRef.current) markerRef.current.remove()
-        markerRef.current = new vietmapgl.Marker()
-          .setLngLat([lng, lat])
-          .addTo(map)
-      },
-      () => alert("Bạn chưa cấp quyền định vị")
+        if (map) {
+          map.flyTo({ center: [lng, lat], zoom: 16 })
+          if (markerRef.current) markerRef.current.remove()
+          markerRef.current = new vietmapgl.Marker({ color: "#3B82F6" }) 
+            .setLngLat([lng, lat])
+            .addTo(map)
+        }
+        try {
+          const SEARCH_KEY = import.meta.env.VITE_VIETMAP_SEARCH_KEY; 
+          const reverseRes = await fetch(
+            `https://maps.vietmap.vn/api/reverse/v3?apikey=${SEARCH_KEY}&lat=${lat}&lng=${lng}`
+          );
+          
+          if (reverseRes.ok) {
+            const reverseData = await reverseRes.json();
+            if (reverseData && reverseData.length > 0) {
+              const fullAddress = reverseData[0].display || reverseData[0].address || reverseData[0].name;
+              setValue("address", fullAddress, { shouldValidate: true });
+              setActiveTab("address"); 
+            }
+          }
+        } catch (error) {
+          console.error("Lỗi khi dịch tọa độ sang địa chỉ:", error);
+        }
+      },() => alert("Bạn chưa cấp quyền định vị")
     )
   }
 
-  // ================= CONVERT ADDRESS =================
   const handleConfirmAddress = async () => {
     const address = getValues("address");
     
@@ -112,24 +127,18 @@ export default function RequestPage() {
         `https://maps.vietmap.vn/api/search/v3?apikey=${SEARCH_KEY}&text=${encodeURIComponent(address)}`
       );
 
-      if (!searchRes.ok) {
-         console.error(`Lỗi API Vietmap Search: ${searchRes.status}`);
-         return;
-      }
+      if (!searchRes.ok) return;
 
       const searchData = await searchRes.json();
       const results = Array.isArray(searchData) ? searchData : (searchData.models || searchData.data || []);
 
       if (results && results.length > 0) {
-        const refId = results[0].ref_id; // kết quả đầu tiên luôn đúng nhất (do nó trả về chuỗi json với 1 array các dữ liệu địa điểm)
-        const placeRes = await fetch( // fetch nó ra để lấy kinh độ và vĩ độ
+        const refId = results[0].ref_id; 
+        const placeRes = await fetch( 
           `https://maps.vietmap.vn/api/place/v3?apikey=${SEARCH_KEY}&refid=${refId}`
         );
 
-        if (!placeRes.ok) {
-           console.error(`Lỗi API Vietmap Place: ${placeRes.status}`);
-           return;
-        }
+        if (!placeRes.ok) return;
 
         const placeData = await placeRes.json();
         const lat = parseFloat(placeData.lat);
@@ -139,10 +148,12 @@ export default function RequestPage() {
            alert("Vietmap không hỗ trợ tọa độ cho địa chỉ này.");
            return;
         }
+
         setValue("locate", `${lat.toFixed(6)}, ${lng.toFixed(6)}`, { shouldValidate: true });
+        setActiveTab("coordinate");
+
         if (map) {
           map.flyTo({ center: [lng, lat], zoom: 16 });
-          
           if (markerRef.current) markerRef.current.remove();
           markerRef.current = new vietmapgl.Marker({ color: "#EF4444" })
             .setLngLat([lng, lat])
@@ -151,12 +162,11 @@ export default function RequestPage() {
       } else {
         alert("Không tìm thấy địa chỉ này trên bản đồ Vietmap.");
       }
-
     } catch (error) {
       console.error("Lỗi tìm tọa độ:", error);
     }
   };
-
+// SUBMIT
   const onSubmit = async (data: RequestSchemaType) => {
     const formData = new FormData()
     formData.append("type", data.type)
@@ -188,8 +198,6 @@ export default function RequestPage() {
             Gửi thông tin cứu hộ
           </h1>
           <form onSubmit={handleSubmit(onSubmit)} onKeyDown={handleKeyDown} className="space-y-4">
-  
-            {/* Phân loại */}
             <div>
               <Label className="text-sm font-semibold text-gray-700">Phân loại <span className="text-red-500">*</span></Label>
               
@@ -212,36 +220,59 @@ export default function RequestPage() {
               {errors.type && <p className="text-red-500 text-xs mt-1">{errors.type.message}</p>}
             </div>
   
-            {/* Vị trí */}
-            <div>
-              <Label>Địa chỉ <span className="text-red-500">*</span></Label>
-              <input
-                type="text"
-                placeholder="Vui lòng nhập đầy đủ địa chỉ của bạn"
-                className={`mt-2 w-full rounded-md border px-3 py-2 mb-2 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
-                {...register("address")}
-              />
-              {errors.address && <p className="text-red-500 text-xs mb-2">{errors.address.message}</p>}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-sm font-semibold text-gray-700">
+                  Vị trí <span className="text-red-500">*</span>
+                </Label>
+                <TabsList className="grid grid-cols-2 w-[200px] h-10">
+                <TabsTrigger value="address" className="text-xs flex items-center justify-center gap-2">
+                  <MapPinned className="w-4 h-4" /> Địa chỉ
+                </TabsTrigger>
+                <TabsTrigger value="coordinate" className="text-xs flex items-center justify-center gap-2">
+                  <Navigation className="w-4 h-4" /> Tọa độ
+                </TabsTrigger>
+              </TabsList>
+              </div>
 
-              <button
-                type="button"
-                onClick={handleConfirmAddress} 
-                className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 transition-colors"
-              >
-                Xác nhận
-              </button>
-            </div>
+              {/* TAB 1: NHẬP ĐỊA CHỈ */}
+              <TabsContent value="address" className="mt-0 space-y-2">
+                <input
+                  type="text"
+                  placeholder="Vui lòng nhập đầy đủ địa chỉ của bạn"
+                  className={`w-full rounded-md border px-3 py-2 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                  {...register("address")}
+                />
+                {errors.address && <p className="text-red-500 text-xs">{errors.address.message}</p>}
+                
+                <button
+                  type="button"
+                  onClick={handleConfirmAddress} 
+                  className="w-full rounded-md bg-green-600 py-2.5 text-white font-medium hover:bg-green-700 transition-colors"
+                >
+                  Xác nhận
+                </button>
+              </TabsContent>
 
-            {/* Tọa độ */}
-            <div>
-              <Label>Tọa độ</Label>
-              <input
-                type="text"
-                readOnly
-                className="mt-2 w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 mb-2 outline-none"
-                {...register("locate")}
-              />
-            </div>
+              <TabsContent value="coordinate" className="mt-0 space-y-2">
+                <input
+                  type="text"
+                  placeholder="Bấm nút bên dưới để lấy GPS hiện tại..."
+                  className={`w-full rounded-md border px-3 py-2 outline-none ${errors.locate ? 'border-red-500' : 'border-gray-300 bg-gray-50'}`}
+                  readOnly 
+                  {...register("locate")}
+                />
+                {errors.locate && <p className="text-red-500 text-xs">{errors.locate.message}</p>}
+                
+                <button
+                  type="button"
+                  onClick={handleGetLocation} 
+                  className="w-full rounded-md bg-[#00c853] hover:bg-[#00e676] py-2.5 text-white font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
+                >
+                  <Locate className="w-5 h-5" /> Lấy vị trí hiện tại
+                </button>
+              </TabsContent>
+            </Tabs>
   
             {/* Mô tả */}
             <div>
