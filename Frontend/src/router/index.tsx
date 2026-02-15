@@ -3,7 +3,7 @@ import Login from '@/pages/LoginPage';
 import { ROUTES } from './routes';
 import MainLayout from "@/layouts/MainLayout";
 import HomePage from '@/pages/HomePage';
-import RequestPage from '@/pages/RequestPage';
+import RequestPage from '@/pages/User/RequestPage';
 import FindRequestPage from '@/pages/FindRequestPage';
 import ContactPage from '@/pages/User/ContactPage';
 import GuidePage from '@/pages/User/GuidePage';
@@ -30,7 +30,7 @@ export const router = createBrowserRouter([
         path: ROUTES.REQUEST,
         element: <RequestPage />,
       },
-      {      
+      {
         path: ROUTES.SEARCH, 
         element: <FindRequestPage />,
       },
