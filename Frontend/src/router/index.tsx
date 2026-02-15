@@ -5,13 +5,12 @@ import MainLayout from "@/layouts/MainLayout";
 import HomePage from '@/pages/HomePage';
 import RequestPage from '@/pages/User/RequestPage';
 import FindRequestPage from '@/pages/FindRequestPage';
-import ContactPage from '@/pages/User/ContactPage';
-import GuidePage from '@/pages/User/GuidePage';
+import ContactPage from '@/pages/ContactPage';
+import GuidePage from '@/pages/GuidePage';
 import ListRequestPage from "@/pages/Coordinator/ListRequestPage.tsx";
 import RequestDetailPage from "@/pages/Coordinator/RequestDetailPage.tsx";
 import FullMapPage from "@/pages/Coordinator/FullMapPage.tsx";
-import ChatBox from "@/layouts/ChatBox.tsx";
-import TestChatBox from "@/pages/TestChatBox.tsx";
+import TestChatBox from "@/pages/Coordinator/TestChatBox";
 
 export const router = createBrowserRouter([
   {
