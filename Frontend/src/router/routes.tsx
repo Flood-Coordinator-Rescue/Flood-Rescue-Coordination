@@ -8,4 +8,5 @@ export const ROUTES = {
   COORDINATE: '/coordination',
   REQUESTDETAILS: '/coordination/requestdetails',
   FULLMAP: '/coordination/fullmap',
+  TESTCHATBOX: '/testchatbox',
 } as const;

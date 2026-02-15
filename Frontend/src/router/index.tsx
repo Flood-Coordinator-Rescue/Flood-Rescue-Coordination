@@ -7,9 +7,11 @@ import RequestPage from '@/pages/RequestPage';
 import FindRequestPage from '@/pages/FindRequestPage';
 import ContactPage from '@/pages/User/ContactPage';
 import GuidePage from '@/pages/User/GuidePage';
-import ListRequestPage from "@/pages/ListRequestPage.tsx";
-import RequestDetailPage from "@/pages/RequestDetailPage.tsx";
-import FullMapPage from "@/pages/FullMapPage.tsx";
+import ListRequestPage from "@/pages/Coordinator/ListRequestPage.tsx";
+import RequestDetailPage from "@/pages/Coordinator/RequestDetailPage.tsx";
+import FullMapPage from "@/pages/Coordinator/FullMapPage.tsx";
+import ChatBox from "@/layouts/ChatBox.tsx";
+import TestChatBox from "@/pages/TestChatBox.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -58,5 +60,9 @@ export const router = createBrowserRouter([
     {
         path: ROUTES.FULLMAP,
         element: <FullMapPage/>,
+    },
+    {
+        path: ROUTES.TESTCHATBOX,
+        element: <TestChatBox/>
     }
 ]);
