@@ -270,24 +270,27 @@ export default function RequestPage() {
     // cái layout chính của trang bản đồ
       <div className="flex h-full w-full overflow-hidden" style={{ height: 'calc(100vh - 80px)' }}>
         <div className="w-[420px] bg-white p-6 shadow-md overflow-y-auto h-full pb-10 z-10 shrink-0 flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" >
-          <div className="flex items-center gap-3 pb-5">
-            
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
-              <User className="w-6 h-6 text-gray-500" /> 
-            </div>
-            
-            <div className="flex flex-col justify-center">
-              <span className="text-lg font-bold text-gray-800">
-                {submittedData?.name || "Người dùng"}
-              </span>
-              
-              <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md w-fit mt-0.5">
-                ID: {submittedData?.phone ? `#${submittedData.phone}` : "#---"}
-              </span>
-            </div>
-            
-          </div>
-          <hr className="border-black mb-3" />
+          {isSubmitted && (
+            <>
+              <div className="flex items-center gap-3 pb-5">
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                  <User className="w-6 h-6 text-gray-500" />
+                </div>
+
+                <div className="flex flex-col justify-center">
+                  <span className="text-lg font-bold text-gray-800">
+                    {submittedData?.name || "Người dùng"}
+                  </span>
+
+                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md w-fit mt-0.5">
+                    ID: {submittedData?.phone ? `#${submittedData.phone}` : "#---"}
+                  </span>
+                </div>
+              </div>
+            <hr className="border-black mb-3" />
+            </>
+          )}
+          
           {!isSubmitted ? (
              <BeforeRequestPage
               isSubmitting={isSubmitting}
