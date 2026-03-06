@@ -16,7 +16,7 @@ interface AuthState {
   setUser: (user: User) => void;
   clearUser: () => void;
 }
-
+//zudtand
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
 
