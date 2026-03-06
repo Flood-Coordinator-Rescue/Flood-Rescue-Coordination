@@ -107,6 +107,7 @@ public class CitizenService {
                                 .map(Vehicle::getType)
                                 .orElse(null);
         }
+
         return new CitizenRescueResponse(
             request.getId(),
             request.getAddress(),
@@ -183,9 +184,10 @@ public class CitizenService {
                 }
                 request.getImages().addAll(newImages);
             }
-        } else {
-            request.setImages(new ArrayList<>());
         }
+//        else {
+//            request.setImages(new ArrayList<>());
+//        }
 
         return mapToRequestResponse(savedRequest);
     }

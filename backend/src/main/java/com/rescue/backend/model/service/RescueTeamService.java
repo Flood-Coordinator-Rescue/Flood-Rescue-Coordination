@@ -1,9 +1,7 @@
 package com.rescue.backend.model.service;
 
 import com.rescue.backend.model.bean.Request;
-import com.rescue.backend.model.bean.RescueTeamAssignment;
 import com.rescue.backend.model.bean.Vehicle;
-import com.rescue.backend.model.dao.RescueTeamAssignmentDAO;
 import com.rescue.backend.model.dao.VehicleDAO;
 import com.rescue.backend.view.dto.image.response.LookupImageResponse;
 import com.rescue.backend.view.dto.rescueTeam.request.UpdateTaskRequest;
@@ -32,14 +30,24 @@ public class RescueTeamService {
     private final VehicleDAO vehicleDAO;
 
     public Page<TeamAssignmentResponse> getTaskByFilter(UUID teamId, String filter, int page) {
-        String dbStatus = (filter == null) ? null : switch (filter.toLowerCase()) {
-            case "đang xử lý" -> "on the way";
-            case "tạm hoãn" -> "delayed";
-            case "hoàn thành" -> "completed";
-            default -> null;
+        // 1. Kiểm tra null/ empty
+        if (filter == null || filter.isBlank()) {
+            return fetchTaskByFilter(teamId, null, page);
+        }
+
+        String cleanFilter = filter.trim().toLowerCase();
+
+        String dbStatus = switch (cleanFilter) {
+            case "đang xử lý", "on the way" -> "on the way";
+            case "tạm hoãn", "delayed" -> "delayed";
+            case "hoàn thành", "completed" -> "completed";
+            default -> throw new IllegalArgumentException("Trạng thái lọc không hợp lệ: " + filter);
         };
 
-        // Tạo pageable cho trang hiện tại, mỗi trang 20 bản ghi
+        return fetchTaskByFilter(teamId, dbStatus, page);
+    }
+
+    private Page<TeamAssignmentResponse> fetchTaskByFilter(UUID teamId, String dbStatus, int page) {
         Pageable pageable = PageRequest.of(page, 20, Sort.by("request.createdAt").descending());
 
         Page<RescueTeamAssignment> assignments = rescueTeamAssignmentDAO.findByTeamAndStatus(teamId, dbStatus, pageable);

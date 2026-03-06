@@ -39,11 +39,18 @@ public class MissionController {
             );
         }
 
-        Page<TeamAssignmentResponse> tasks = rescueTeamService.getTaskByFilter(teamId, filter, page);
+        try {
+            Page<TeamAssignmentResponse> tasks = rescueTeamService.getTaskByFilter(teamId, filter, page);
 
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(200,"Trả về tasks cho đội cứu hộ",tasks)
-        );
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(200,"Trả về tasks cho đội cứu hộ",tasks)
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject(404,e.getMessage(), null)
+            );
+        }
+
     }
 
     @GetMapping("/tasks/{id}")

@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Account")
+@Table(name = "Staff")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Account {
+public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -43,9 +43,17 @@ public class Account {
     @Column(precision = 18, scale = 10)
     private BigDecimal longitude;
 
-    @Column(name = "account_state")
-    private String accountState = "offline";
+    @Column(name = "staff_state")
+    private String staffState = "offline";
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "staff")
     private List<Vehicle> vehicles;
+
+    //Danh sách những yêu cầu mà Staff này đã duyệt (với vai trò Coordinator).
+    @OneToMany(mappedBy = "coordinator")
+    private List<Request> coordinatedRequests;
+
+    //Danh sách những nhiệm vụ mà Staff này phải đi làm (với vai trò Rescue Team).
+    @OneToMany(mappedBy = "rescueTeam")
+    private List<Request> assignedTasks;
 }
