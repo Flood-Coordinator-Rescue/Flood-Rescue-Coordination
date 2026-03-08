@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,5 +26,8 @@ public class Vehicle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rescue_team_id", nullable = false)
-    private Account account;
+    private Staff staff;
+
+    @OneToMany(mappedBy = "vehicle")
+    private List<Request> requests;
 }
