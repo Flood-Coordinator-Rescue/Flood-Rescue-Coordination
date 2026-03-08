@@ -48,12 +48,24 @@ public class Request {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coordinator_id")
+    private Staff coordinator;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rescue_team_id")
+    private Staff rescueTeam;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
+
     @OneToMany(mappedBy = "request")
     private List<RequestImage> images;
 
     @OneToMany(mappedBy = "request")
     private List<Message> messages;
 
-    @OneToMany(mappedBy = "request")
-    private List<RescueTeamAssignment> rescueTeamAssignment;
+    @Column(columnDefinition = "NVARCHAR(MAX)")
+    private String report;
 }
