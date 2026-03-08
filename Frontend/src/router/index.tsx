@@ -80,6 +80,15 @@ export const router = createBrowserRouter([
         element: <MainLayout role={2} />,
         children: [{ index: true, element: <RescueDetailPage /> }],
       },
+      { path: ROUTES.COORDINATE_MAP, element: <FullMapCoordinatorPage /> },
+      { path: ROUTES.COORDINATE_CHAT, element: <TestChatBox /> },
+    ],
+  },
+
+  // NHÓM ĐỘI CỨU HỘ
+  {
+    element: <ProtectedRoute allowedRoles={["rescue team", "rescue"]} />,
+    children: [
       {
         path: ROUTES.RESCUE_CHAT,
         element: <MainLayout role={2} />,
