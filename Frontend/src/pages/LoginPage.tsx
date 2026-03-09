@@ -40,6 +40,10 @@ export default function Login() {
         navigate(ROUTES.RESCUE);
       } else if (role === "rescue coordinator") {
         navigate(ROUTES.COORDINATE);
+        return;
+      } else if (role === "manager") {
+        navigate("/");
+        return;
       } else {
         navigate("/");
       }
