@@ -22,14 +22,14 @@ public class CorsConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
 
-                        // Cho phép CORS preflight
+                        // Cho phép preflight request
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Cho phép login API
+                        // Cho phép login
                         .requestMatchers("/api/v1/auth/**").permitAll()
 
-                        // Các API khác cần auth
-                        .anyRequest().authenticated()
+                        // để interceptor xử lý quyền
+                        .anyRequest().permitAll()
                 );
 
         return http.build();
