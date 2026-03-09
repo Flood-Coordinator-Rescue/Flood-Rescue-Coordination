@@ -39,7 +39,6 @@ export function useAuth() {
 
   const logout = () => {
     clearStaff();
-    // localStorage.removeItem("accessToken"); // Xóa token khi đăng xuất
     navigate("/login");
   };
 
