@@ -18,7 +18,7 @@ import FullMapRescuePage from "@/pages/Rescue/FullMapRescuePage";
 import RescueChatBox from "@/pages/Rescue/RescueChatBox";
 
 // Manager Pages
-// import OverviewPage from "@/pages/Manager/OverviewPage";
+import { OverviewPage } from "@/pages/Manager/OverviewPage";
 // import ManageEmployeePage from "@/pages/Manager/ManageEmployeePage";
 // import ManageTeamPage from "@/pages/Manager/ManageTeamPage";
 // import ManageVehiclePage from "@/pages/Manager/ManageVehiclePage";
@@ -105,7 +105,7 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.MANAGER,
         element: <MainLayout role={3} />,
-        children: [{ index: true, element: <HomePage /> }],
+        children: [{ index: true, element: <OverviewPage /> }],
       },
       // {
       //   path: ROUTES.MANAGER_EMPLOYEE,
