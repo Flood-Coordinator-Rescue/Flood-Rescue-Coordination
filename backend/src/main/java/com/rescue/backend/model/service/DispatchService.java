@@ -2,14 +2,15 @@ package com.rescue.backend.model.service;
 
 import com.rescue.backend.model.bean.Request;
 import com.rescue.backend.model.dao.RequestDAO;
-import com.rescue.backend.view.dto.coordinator.request.FilterRequest;
 import com.rescue.backend.view.dto.coordinator.request.TakeListRequest;
 import com.rescue.backend.view.dto.coordinator.response.SpecificResponse;
 import com.rescue.backend.view.dto.coordinator.response.TakeListResponse;
+import com.rescue.backend.view.dto.coordinator.response.TakePageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -18,8 +19,11 @@ public class DispatchService {
     @Autowired
     private RequestDAO requestDAO;
 
-     public  List<TakeListResponse> getRequestCitizen(TakeListRequest takeListRequest){
-         return requestDAO.getRequestCitizen();
+     public  TakePageResponse getRequestCitizen(TakeListRequest takeListRequest){
+         Page<TakeListResponse> page =
+                 requestDAO.getRequestCitizen(takeListRequest.status(), PageRequest.of(takeListRequest.pageNumber(), takeListRequest.pageSize()));
+
+         return new TakePageResponse(page.getTotalPages(), page.getContent());
      }
 
      public SpecificResponse getSpecificRequest(UUID id){
@@ -37,19 +41,5 @@ public class DispatchService {
                  request.getStatus(),
                  request.getCreatedAt()
          );
-     }
-
-     public List<TakeListResponse> filterRequestCitizen(FilterRequest filterRequest){
-         List<Request> requests = requestDAO.findByStatus(filterRequest.status());
-
-         return requests.stream()
-                 .map(r -> new TakeListResponse(
-                         r.getId(),
-                         r.getCitizen().getPhone(),
-                         r.getCitizen().getName(),
-                         r.getStatus(),
-                         r.getCreatedAt()
-                 ))
-                 .toList();
      }
 }

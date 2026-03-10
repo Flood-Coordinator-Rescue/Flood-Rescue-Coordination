@@ -2,12 +2,18 @@ import {useEffect, useState} from "react";
 import type {RescueRequest} from "@/pages/Coordinator/ListRequestPage.tsx";
 import apiClient from "@/services/axiosClient.ts";
 
-export function useRequestList() {
+type TakePageResponse = {
+    totalPage: number;
+    list: RescueRequest[];
+};
+
+export function useRequestList(status:string) {
 
     const pageSize = 10;
 
     const [pageNumber, setPageNumber] = useState(0);
     const [requestList, setRequestList] = useState<RescueRequest[]>([]);
+    const [totalPage, setTotalPage] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const handlePageChange = (left: boolean) => {
@@ -15,7 +21,7 @@ export function useRequestList() {
             if (left) {
                 return prev > 0 ? prev - 1 : 0;
             } else {
-                if (requestList.length === pageSize) {
+                if (prev < totalPage - 1) {
                     return prev + 1;
                 }
                 return prev;
@@ -30,11 +36,13 @@ export function useRequestList() {
 
             const res = await apiClient.post("/coordinator/takeListRequest", {
                 pageNumber,
-                pageSize
+                pageSize,
+                status
             });
             console.log(res);
-            // @ts-ignore
-            setRequestList(res);
+            const data = res as unknown as TakePageResponse;
+            setRequestList(data.list);
+            setTotalPage(data.totalPage);
         } catch (error) {
             console.error("Fetch request list failed:", error);
         } finally {
@@ -43,12 +51,17 @@ export function useRequestList() {
     };
 
     useEffect(() => {
+        setPageNumber(0);
+    }, [status]);
+
+    useEffect(() => {
         fetchRequestList();
-    }, [pageNumber, pageSize]);
+    }, [pageNumber, pageSize, status]);
 
     return {
         pageNumber,
         pageSize,
+        totalPage,
         requestList,
         handlePageChange,
         loading

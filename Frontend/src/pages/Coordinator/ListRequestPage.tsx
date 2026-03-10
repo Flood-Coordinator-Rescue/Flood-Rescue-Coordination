@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/table.tsx";
 import { ClipboardPlus, RefreshCcw, Clock, SquareCheck, CircleX, SlidersVertical, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import {useNavigate} from "react-router-dom";
-import {ROUTES} from "@/router/routes.tsx";
 import {useRequestList} from "@/hooks/useRequestList.ts";
+import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
 
 export type RescueRequest = {
-    id: string;
+    requestID: string;
     phone: string;
     name: string;
     status: "accept" | "reject" | "delayed" | "processing";
@@ -77,54 +77,112 @@ export type RescueRequest = {
 // ];
 
 export default function ListRequestPage() {
+    const [filter, setFilter] = useState<string>("");
+
     return (
         <div className="flex flex-col w-full pt-[3vh]">
-            <Filters />
-            <Requests />
+            <Filters filter={filter} setFilter={setFilter} />
+            <Requests filter={filter}/>
         </div>
     );
 }
 
-export function Filters(){
-    const filterButton =
-        "!rounded-none !bg-white !border !border-gray-300 !w-[10vw] !h-[15vh] !text-black " +
-        "flex flex-col items-center justify-center gap-2";
+export function Filters({filter, setFilter}: {
+    filter: string; setFilter: Dispatch<SetStateAction<string>>;
+}) {
+
+    const baseButton =
+        "!rounded-none !bg-white border-2 !w-[10vw] !h-[15vh] " +
+        "flex flex-col items-center justify-center gap-2 transition-all";
+
+    const colorMap: Record<string, string> = {
+        accept:
+            "border-[3px] border-emerald-400 text-emerald-600 hover:border-[3px] hover:border-emerald-400 hover:text-emerald-600",
+        reject:
+            "border-[3px] border-red-400 text-red-600 hover:border-[3px] hover:border-red-400 hover:text-red-600",
+        processing:
+            "border-[3px] border-yellow-400 text-yellow-700 hover:border-[3px] hover:border-yellow-400 hover:text-yellow-700",
+        delayed:
+            "border-[3px] border-sky-400 text-sky-600 hover:border-[3px] hover:border-sky-400 hover:text-sky-600",
+        completed:
+            "border-[3px] border-indigo-400 text-indigo-600 hover:border-[3px] hover:border-indigo-400 hover:text-indigo-600"
+    };
+
+    const defaultStyle =
+        "border-gray-300 text-gray-700 hover:border-[3px] hover:text-gray-800";
+
+    const getClass = (value: string) =>
+        `${baseButton} ${filter === value ? colorMap[value] : defaultStyle}`;
+
+    const handleFilterClick = (value: string) => {
+        setFilter(prev => prev === value ? "" : value);
+    };
 
     return (
         <div className="!w-full bg-white flex-[2] !pt-[4vh] !pb-[1vh]
         flex flex-row justify-center items-center gap-10">
-            <Button className={filterButton}>
+
+            <Button
+                className={getClass("accept")}
+                onClick={() => handleFilterClick("accept")}
+            >
                 <ClipboardPlus className="!w-10 !h-10"/>
                 <span className="!text-xl font-semibold">Yêu cầu mới</span>
             </Button>
-            <Button className={filterButton}>
+
+            <Button
+                className={getClass("processing")}
+                onClick={() => handleFilterClick("processing")}
+            >
                 <RefreshCcw className="!w-10 !h-10"/>
                 <span className="!text-xl font-semibold">Đang xử lý</span>
             </Button>
-            <Button className={filterButton}>
+
+            <Button
+                className={getClass("delayed")}
+                onClick={() => handleFilterClick("delayed")}
+            >
                 <Clock className="!w-10 !h-10"/>
                 <span className="!text-xl font-semibold">Tạm hoãn</span>
             </Button>
-            <Button className={filterButton}>
+
+            <Button
+                className={getClass("completed")}
+                onClick={() => handleFilterClick("completed")}
+            >
                 <SquareCheck className="!w-10 !h-10"/>
                 <span className="!text-xl font-semibold">Hoàn thành</span>
             </Button>
-            <Button className={filterButton}>
+
+            <Button
+                className={getClass("reject")}
+                onClick={() => handleFilterClick("reject")}
+            >
                 <CircleX className="!w-10 !h-10"/>
                 <span className="!text-xl font-semibold">Đã hủy</span>
             </Button>
+
         </div>
     );
 }
 
-export function Requests(){
+export function Requests({filter}: {
+    filter: string;
+}){
 
-    const { pageNumber, pageSize, requestList, handlePageChange } = useRequestList();
+    const { pageNumber, pageSize, totalPage, requestList, handlePageChange } = useRequestList(filter);
+
+    useEffect(() => {
+        console.log("filter: ", filter);
+    }, [filter]);
 
     const navigate = useNavigate();
 
-    const handleOpenRequest = () => {
-        navigate(ROUTES.REQUESTDETAILS);
+    const handleOpenRequest = (request: RescueRequest) => {
+        console.log("request sent: ", request);
+        navigate(`/coordinate/detail/${request.requestID}`,{
+            state: request
+        });
     };
 
     const columns = [
@@ -146,7 +204,9 @@ export function Requests(){
                 columns={columns}
                 data={requestList}
                 renderRow={(r, idx) => (
-                    <TableRow key={pageNumber*pageSize + idx + 1} onClick={handleOpenRequest}>
+                    <TableRow key={pageNumber*pageSize + idx + 1}
+                              onClick={() => handleOpenRequest(r)}
+                    >
                         <TableCell className="font-semibold">0{pageNumber*pageSize + idx + 1}</TableCell>
                         <TableCell>{r.phone}</TableCell>
                         <TableCell>{r.name}</TableCell>
@@ -163,14 +223,15 @@ export function Requests(){
                     variant="ghost"
                     onClick={() => handlePageChange(true)}
                 >
-                    <ChevronsLeft className="w-4 h-4" />
+                    <ChevronsLeft className="w-3 h-3" />
                 </Button>
+                {pageNumber + 1}/{totalPage}
                 <Button
                     className="rounded-full bg-gray-100 hover:bg-gray-300 p-2 ml-[0.5vw]"
                     variant="ghost"
                     onClick={() => handlePageChange(false)}
                 >
-                    <ChevronsRight className="w-4 h-4" />
+                    <ChevronsRight className="w-3 h-3" />
                 </Button>
             </div>
         </div>

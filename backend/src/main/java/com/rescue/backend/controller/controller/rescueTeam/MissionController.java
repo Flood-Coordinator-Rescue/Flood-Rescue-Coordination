@@ -23,45 +23,70 @@ public class MissionController {
     @Autowired
     private RescueTeamService rescueTeamService;
 
-//    @GetMapping("/tasks")
-//    public ResponseEntity<ResponseObject> getMyTasks(
-//            @RequestParam(required = false) String filter,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(required = false) UUID testAccountId,
-//            HttpSession session
-//    ){
-//        UUID teamId = (testAccountId != null) ? testAccountId : (UUID) session.getAttribute("TEAM_ID");
-//
-//        // Kiểm tra cuối cùng nếu cả 2 đều null
-//        if (teamId == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-//                    new ResponseObject(401, "Lỗi: Vui lòng truyền testAccountId trên Swagger hoặc đăng nhập", null)
-//            );
-//        }
-//
-//        Page<TeamAssignmentResponse> tasks = rescueTeamService.getTaskByFilter(teamId, filter, page);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                new ResponseObject(200,"Trả về tasks cho đội cứu hộ",tasks)
-//        );
-//    }
-//
-//    @GetMapping("/tasks/{id}")
-//    public ResponseEntity<ResponseObject> getTaskById(@PathVariable UUID id){
-//        TaskDetailResponse detailResponse = rescueTeamService.getAssignmentDetail(id);
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                new ResponseObject(200,"Danh sách yêu cầu tải thành công",detailResponse)
-//        );
-//    }
-//
-//    @PatchMapping("/tasks/{id}/status")
-//    public ResponseEntity<ResponseObject> updateTaskStatus(
-//            @PathVariable UUID id,
-//            @RequestBody UpdateTaskRequest updateRequest
-//    ){
-//        String result = rescueTeamService.updateAssignment(id, updateRequest);
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                new ResponseObject(201,"Tự động chuyển về trang task",result)
-//        );
-//    }
+    @GetMapping("/tasks")
+    public ResponseEntity<ResponseObject> getMyTasks(
+            @RequestParam(required = false) String filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) UUID testAccountId,
+            HttpSession session
+    ){
+        UUID teamId = (testAccountId != null) ? testAccountId : (UUID) session.getAttribute("STAFF_ID");
+
+        // Kiểm tra cuối cùng nếu cả 2 đều null
+        if (teamId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ResponseObject(401, "Lỗi: Vui lòng truyền testAccountId trên Swagger hoặc đăng nhập", null)
+            );
+        }
+
+        try {
+            Page<TeamAssignmentResponse> tasks = rescueTeamService.getTaskByFilter(teamId, filter, page);
+
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(200,"Trả về tasks cho đội cứu hộ",tasks)
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject(404,e.getMessage(), null)
+            );
+        }
+
+    }
+
+    @GetMapping("/tasks/{id}")
+    public ResponseEntity<ResponseObject> getTaskById(@PathVariable UUID id){
+        try {
+            TaskDetailResponse detailResponse = rescueTeamService.getAssignmentDetail(id);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(200,"Danh sách yêu cầu tải thành công",detailResponse)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject(404, e.getMessage(), null)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ResponseObject(500, e.getMessage(), null)
+            );
+        }
+
+    }
+
+    @PatchMapping("/tasks/{id}/status")
+    public ResponseEntity<ResponseObject> updateTaskStatus(
+            @PathVariable UUID id,
+            @RequestBody UpdateTaskRequest updateRequest
+    ){
+        try {
+            String result = rescueTeamService.updateAssignment(id, updateRequest);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(201,"Tự động chuyển về trang task",result)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ResponseObject(500, e.getMessage(), null)
+            );
+        }
+
+    }
 }

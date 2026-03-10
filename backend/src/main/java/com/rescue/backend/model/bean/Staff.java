@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.geo.Point;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.Point;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,8 +18,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class Staff {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID id;
 
     @Column(nullable = false, length = 255)
@@ -53,6 +57,17 @@ public class Staff {
     @Column(name = "staff_state")
     private String staffState = "offline";
 
-    @OneToMany(mappedBy = "rescueTeam")
+    @OneToMany(mappedBy = "staff")
     private List<Vehicle> vehicles;
+
+    // Staff đóng vai trò Coordinator
+    @OneToMany(mappedBy = "coordinator")
+    private List<Request> coordinatedRequests;
+
+    // Staff đóng vai trò Rescue Team
+    @OneToMany(mappedBy = "rescueTeam")
+    private List<Request> assignedTasks;
+
+    @OneToMany(mappedBy = "senderStaff")
+    private List<Message> messages;
 }

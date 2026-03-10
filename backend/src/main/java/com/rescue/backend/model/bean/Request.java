@@ -4,18 +4,25 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
 @Entity
 @Table(name = "Request")
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class Request {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID id;
 
     // Citizen gửi request
@@ -26,7 +33,7 @@ public class Request {
     @Column(nullable = false, length = 20)
     private String type;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Lob
     private String description;
 
     @Column(length = 200)

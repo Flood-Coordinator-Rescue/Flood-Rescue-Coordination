@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    final String RESCUE_TEAM = "rescue team";
+
+    private static final String RESCUE_TEAM = "rescue team";
 
     @Autowired
     private StaffDAO staffDAO;
@@ -20,6 +21,7 @@ public class AuthService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
+
         String loginErrorMessage = "Số điện thoại hoặc mật khẩu không chính xác";
 
         Staff staff = staffDAO.findByPhone(loginRequest.phone())
@@ -29,7 +31,7 @@ public class AuthService {
             throw new BadCredentialsException(loginErrorMessage);
         }
 
-        boolean isRescueTeam =  RESCUE_TEAM.equals(staff.getRole());
+        boolean isRescueTeam = RESCUE_TEAM.equals(staff.getRole());
 
         return new LoginResponse(
                 staff.getId(),
@@ -41,6 +43,5 @@ public class AuthService {
                 isRescueTeam ? staff.getLatitude() : null,
                 isRescueTeam ? staff.getLongitude() : null
         );
-
     }
 }
