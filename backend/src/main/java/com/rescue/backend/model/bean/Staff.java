@@ -22,19 +22,19 @@ public class Staff {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, length = 30, unique = true)
     private String phone;
 
-    @Column(length = 255)
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, length = 20)
     private String role;
 
-    @Column(length = 255, name = "team_name")
+    @Column(name = "team_name")
     private String teamName;
 
     @Column(name = "team_size")
