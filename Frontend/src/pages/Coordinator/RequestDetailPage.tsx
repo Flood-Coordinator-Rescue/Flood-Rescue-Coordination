@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import {useRequestDetail} from "@/hooks/useRequestDetail.ts";
 import type {RescueRequest} from "@/pages/Coordinator/ListRequestPage.tsx";
+
 import {useVehicleList} from "@/hooks/useVehicle.ts";
 
 const DEFAULT_CENTER: [number, number] = [10.7769, 106.7009];
@@ -43,6 +44,7 @@ export type RequestDetail = {
     additionalLink: string;
     status: string;
     createdAt: string;
+
     urgency: string | null;
     rescueTeamId: string | null;
     rescueTeamName: string | null;
@@ -133,7 +135,6 @@ export function Information(){
             setRescueTeam(requestDetail.rescueTeamName);
         }
     }, [requestDetail]);
-
     console.log(requestDetail);
 
     const normalStyle = "!bg-transparent";
@@ -163,6 +164,7 @@ export function Information(){
         return `${days} ngày trước`;
     }
 
+
     function requestType(type?:string) {
         switch (type) {
             case "goods": return "cung cấp như yếu phẩm";
@@ -170,11 +172,11 @@ export function Information(){
             default: return "khác";
         }
     }
-
     return (
        <Card className="bg-white w-[54vw] h-[75vh] !py-[2vh]
         overflow-y-auto hide-scrollbar">
             <CardHeader>
+              
                 <CardTitle className="text-lg font-bold mb-[-1vh]">Yêu cầu loại {requestType(requestDetail?.type)}</CardTitle>
                 <CardDescription className="flex flex-row justify-between items-start text-black">
                     <div>
