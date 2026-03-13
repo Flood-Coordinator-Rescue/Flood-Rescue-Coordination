@@ -18,12 +18,14 @@ public class CorsConfig {
                                 "http://127.0.0.1:*",
                                 "https://floodrescuecoordination-production.up.railway.app",
                                 "https://be-floodrescuecoordination-production.up.railway.app",
-                                "https://fe-floodrescuecoordination-production.up.railway.app"
+                                "https://fe-floodrescuecoordination-production.up.railway.app",
+                                "https://fe-flood-rescue-coordination-production.up.railway.app"
+
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
-    };
+    }
 }
