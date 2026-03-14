@@ -20,8 +20,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const normalizeRole = (value?: string | null) =>
-    (value ?? "").trim().toLowerCase();
 
   const [errorMsg, setErrorMsg] = useState("");
   const handleLogin = async (e: React.FormEvent) => {
@@ -35,13 +33,12 @@ export default function Login() {
         return;
       }
 
-      const role = normalizeRole(staff.role);
-
+      const role = staff.role?.trim().toLowerCase();
       if (role === "quản lý") {
         navigate(ROUTES.MANAGER);
-      } else if (role === "điều phối viên") {
-        navigate(ROUTES.RESCUE);
       } else if (role === "cứu hộ") {
+        navigate(ROUTES.RESCUE);
+      } else if (role === "điều phối viên") {
         navigate(ROUTES.COORDINATE);
       } else {
         navigate("/");
