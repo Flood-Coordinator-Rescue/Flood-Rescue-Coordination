@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input.tsx";
 
 type TeamRow = {
-  id: number;
+  id: string;
   teamName: string;
   phone: string;
   quantity: number;
@@ -21,7 +21,7 @@ type TeamRow = {
 
 const fakeTeams: TeamRow[] = [
   {
-    id: 1,
+    id: "8c95365f-1f65-11f1-86e9-a2aa24837ca7",
     teamName: "Nguyễn Văn A",
     phone: "0723456789",
     quantity: 5,
@@ -29,7 +29,7 @@ const fakeTeams: TeamRow[] = [
     totalTasks: 24,
   },
   {
-    id: 2,
+    id: "9e43c215-1f65-11f1-86e9-a2aa24837ca7",
     teamName: "Nguyễn Văn A",
     phone: "0234583392",
     quantity: 3,
@@ -37,7 +37,7 @@ const fakeTeams: TeamRow[] = [
     totalTasks: 24,
   },
   {
-    id: 3,
+    id: "ac72076d-1f65-11f1-86e9-a2aa24837ca7",
     teamName: "Nguyễn Văn A",
     phone: "0908493846",
     quantity: 4,
@@ -45,7 +45,7 @@ const fakeTeams: TeamRow[] = [
     totalTasks: 24,
   },
   {
-    id: 4,
+    id: "b9324a2f-1f65-11f1-86e9-a2aa24837ca7",
     teamName: "Nguyễn Văn A",
     phone: "0384756884",
     quantity: 5,
@@ -59,8 +59,8 @@ export const ManageTeamPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
-  const [editingTeamId, setEditingTeamId] = useState<number | null>(null);
-  const [deletingTeamId, setDeletingTeamId] = useState<number | null>(null);
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
+  const [deletingTeamId, setDeletingTeamId] = useState<string | null>(null);
   const [form, setForm] = useState({
     teamName: "",
     memberCount: "",
@@ -118,7 +118,7 @@ export const ManageTeamPage = () => {
     }
 
     const nextTeam: TeamRow = {
-      id: teams.length + 1,
+      id: crypto.randomUUID(),
       teamName: form.teamName.trim(),
       phone: form.phone.trim(),
       quantity: count,
@@ -131,7 +131,7 @@ export const ManageTeamPage = () => {
     setIsDialogOpen(false);
   };
 
-  const handleOpenDelete = (id: number) => {
+  const handleOpenDelete = (id: string) => {
     setDeletingTeamId(id);
     setIsConfirmDeleteOpen(true);
   };
@@ -174,8 +174,14 @@ export const ManageTeamPage = () => {
 
               <div className="grid gap-6 py-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-700">Tên của đội</p>
+                  <label
+                    htmlFor="team-name"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Tên của đội
+                  </label>
                   <Input
+                    id="team-name"
                     value={form.teamName}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, teamName: e.target.value }))
@@ -185,10 +191,14 @@ export const ManageTeamPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-700">
+                  <label
+                    htmlFor="team-member-count"
+                    className="text-sm font-medium text-slate-700"
+                  >
                     Số lượng thành viên
-                  </p>
+                  </label>
                   <Input
+                    id="team-member-count"
                     type="number"
                     value={form.memberCount}
                     onChange={(e) =>
@@ -199,8 +209,14 @@ export const ManageTeamPage = () => {
                 </div>
 
                 <div className="space-y-2 sm:col-span-2">
-                  <p className="text-sm font-medium text-slate-700">Số điện thoại</p>
+                  <label
+                    htmlFor="team-phone"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Số điện thoại
+                  </label>
                   <Input
+                    id="team-phone"
                     value={form.phone}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, phone: e.target.value }))
@@ -240,7 +256,7 @@ export const ManageTeamPage = () => {
                 key={team.id}
                 className={`text-center text-base text-slate-900 ${index < teams.length - 1 ? "border-b border-slate-200" : ""}`}
               >
-                <td className="py-3 font-semibold">0{team.id}</td>
+                <td className="py-3 font-semibold">{String(index + 1).padStart(2, "0")}</td>
                 <td className="py-3">{team.teamName}</td>
                 <td className="py-3">{team.phone}</td>
                 <td className="py-3">{team.quantity}</td>
@@ -250,14 +266,22 @@ export const ManageTeamPage = () => {
                 <td className="py-3">{team.totalTasks}</td>
                 <td className="py-3">
                   <div className="flex items-center justify-center gap-3">
-                    <Pencil
+                    <button
+                      type="button"
+                      aria-label={`Sửa đội cứu hộ ${team.teamName}`}
                       onClick={() => handleOpenEdit(team)}
-                      className="h-4 w-4 cursor-pointer text-indigo-500"
-                    />
-                    <Trash2
+                      className="inline-flex items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                    >
+                      <Pencil className="h-4 w-4 text-indigo-500" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Xóa đội cứu hộ ${team.teamName}`}
                       onClick={() => handleOpenDelete(team.id)}
-                      className="h-4 w-4 cursor-pointer text-red-500"
-                    />
+                      className="inline-flex items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </button>
                   </div>
                 </td>
               </tr>

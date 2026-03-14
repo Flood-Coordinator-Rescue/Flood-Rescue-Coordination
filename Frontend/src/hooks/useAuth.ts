@@ -3,21 +3,38 @@ import { useNavigate } from "react-router-dom";
 import apiClient from "@/services/axiosClient";
 import { useAuthStore, type Staff } from "@/store/authStore";
 
+const isNullableString = (value: unknown): value is string | null =>
+  value === null || typeof value === "string";
+
+const isNullableNumber = (value: unknown): value is number | null =>
+  value === null || typeof value === "number";
+
+const isStaffShape = (value: unknown): value is Staff => {
+  if (!value || typeof value !== "object") return false;
+
+  const candidate = value as Record<string, unknown>;
+
+  return (
+    typeof candidate.accountId === "string" &&
+    typeof candidate.name === "string" &&
+    typeof candidate.phone === "string" &&
+    typeof candidate.role === "string" &&
+    isNullableString(candidate.teamName) &&
+    isNullableNumber(candidate.teamSize) &&
+    isNullableNumber(candidate.latitude) &&
+    isNullableNumber(candidate.longitude)
+  );
+};
+
 const getStaffFromLoginResponse = (payload: unknown): Staff | null => {
   if (!payload || typeof payload !== "object") return null;
 
   const candidate = payload as Record<string, unknown>;
 
-  const directRole = candidate.role;
-  if (typeof directRole === "string") return candidate as unknown as Staff;
+  if (isStaffShape(candidate)) return candidate;
 
   const nested = candidate.data;
-  if (nested && typeof nested === "object") {
-    const nestedObj = nested as Record<string, unknown>;
-    if (typeof nestedObj.role === "string") {
-      return nestedObj as unknown as Staff;
-    }
-  }
+  if (isStaffShape(nested)) return nested;
 
   return null;
 };
@@ -39,7 +56,9 @@ export function useAuth() {
 
       const staffData = getStaffFromLoginResponse(res);
       if (!staffData) {
-        console.error("Unexpected login response shape:", res);
+        console.error("Unexpected login response shape for login attempt", {
+          code: "AUTH_RESP_MALFORMED",
+        });
         return null;
       }
 

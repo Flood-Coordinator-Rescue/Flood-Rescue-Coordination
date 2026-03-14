@@ -40,8 +40,8 @@ export const OverviewPage = () => {
   ];
   const topProvinces = [
     { name: "Hà Tĩnh", requests: 40 },
-    { name: "Hà Tĩnh", requests: 40 },
-    { name: "Hà Tĩnh", requests: 40 },
+    { name: "Quảng Bình", requests: 40 },
+    { name: "Thừa Thiên Huế", requests: 40 },
   ];
 
   return (

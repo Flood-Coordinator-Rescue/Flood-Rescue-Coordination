@@ -336,6 +336,8 @@ export function ManagerHeader({ noty }: { noty: boolean }) {
     : "/manager";
 
   const displayName = staff?.name ?? "Chưa có tên";
+  const mobileDisplayName =
+    displayName.length > 20 ? `${displayName.slice(0, 20)}...` : displayName;
 
   return (
     <>
@@ -359,6 +361,22 @@ export function ManagerHeader({ noty }: { noty: boolean }) {
                 </Button>
               </div>
             </div>
+          </div>
+
+          <div className="flex items-center justify-between bg-slate-950 px-4 py-3 text-gray-200 md:hidden">
+            <div className="flex items-center gap-2">
+              <CircleUserRound size={22} />
+              <span className="max-w-[160px] truncate text-sm font-semibold">
+                {mobileDisplayName}
+              </span>
+            </div>
+            <Button
+              type="button"
+              onClick={() => setIsLogoutOpen(true)}
+              className="h-8 !bg-white !px-3 !py-1 !text-sm !text-black hover:!bg-gray-200"
+            >
+              Đăng xuất
+            </Button>
           </div>
 
           <nav className="mx-auto flex w-full max-w-[1200px] items-stretch overflow-x-auto">

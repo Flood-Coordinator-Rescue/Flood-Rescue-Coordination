@@ -85,8 +85,11 @@ export const ManageVehiclePage = () => {
       return;
     }
 
+    const nextId =
+      vehicles.length > 0 ? Math.max(...vehicles.map((vehicle) => vehicle.id)) + 1 : 1;
+
     const nextVehicle: Vehicle = {
-      id: vehicles.length + 1,
+      id: nextId,
       type: form.type.trim(),
       ownerTeam: form.ownerTeam.trim(),
       status: "Đang sử dụng",
@@ -111,7 +114,7 @@ export const ManageVehiclePage = () => {
 
   return (
     <div className="flex w-full flex-col bg-white pt-[3vh]">
-      <div className="w-full p-4">
+      <div className="min-h-[calc(100vh-180px)] w-full p-4">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-slate-900">Quản lý phương tiện</h2>
           <Dialog
@@ -140,16 +143,28 @@ export const ManageVehiclePage = () => {
               </DialogHeader>
               <div className="grid gap-6 py-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-700">Loại phương tiện</p>
+                  <label
+                    htmlFor="vehicle-type"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Loại phương tiện
+                  </label>
                   <Input
+                    id="vehicle-type"
                     value={form.type}
                     onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value }))}
                     className="rounded-none border-0 border-b border-slate-400 px-0 shadow-none focus-visible:ring-0"
                   />
                 </div>
                 <div className="space-y-2 sm:pt-0.5">
-                  <p className="text-sm font-medium text-slate-700">Đội sở hữu</p>
+                  <label
+                    htmlFor="vehicle-owner-team"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Đội sở hữu
+                  </label>
                   <Input
+                    id="vehicle-owner-team"
                     value={form.ownerTeam}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, ownerTeam: e.target.value }))
@@ -194,45 +209,54 @@ export const ManageVehiclePage = () => {
           </DialogContent>
         </Dialog>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
-            <thead>
-              <tr className="bg-slate-200 text-left text-base font-bold text-slate-900">
-                <th className="px-3 py-3">Loại phương tiện</th>
-                <th className="px-3 py-3">Đội sở hữu</th>
-                <th className="px-3 py-3 text-center">Tình trạng</th>
-                <th className="px-3 py-3 text-center">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {vehicles.map((vehicle) => (
-                <tr key={vehicle.id} className="text-base text-slate-800">
-                  <td className="px-3 py-4 font-semibold">{vehicle.type}</td>
-                  <td className="px-3 py-4 text-slate-700">{vehicle.ownerTeam}</td>
-                  <td className="px-3 py-4 text-center">
-                    <span
-                      className={`inline-flex w-[150px] justify-center rounded-xl px-3 py-1 text-base ${statusStyle[vehicle.status]}`}
+        <table className="w-full table-fixed">
+          <thead>
+            <tr className="bg-slate-200 text-center text-base font-bold text-slate-900">
+              <th className="py-3">Loại phương tiện</th>
+              <th className="py-3">Đội sở hữu</th>
+              <th className="py-3">Tình trạng</th>
+              <th className="py-3">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {vehicles.map((vehicle, index) => (
+              <tr
+                key={vehicle.id}
+                className={`text-center text-base text-slate-900 ${index < vehicles.length - 1 ? "border-b border-slate-200" : ""}`}
+              >
+                <td className="py-3 font-semibold">{vehicle.type}</td>
+                <td className="py-3">{vehicle.ownerTeam}</td>
+                <td className="py-3">
+                  <span
+                    className={`inline-flex w-[170px] justify-center rounded-full px-3 py-1 text-base ${statusStyle[vehicle.status]}`}
+                  >
+                    {vehicle.status}
+                  </span>
+                </td>
+                <td className="py-3">
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      aria-label={`Sửa phương tiện ${vehicle.type}`}
+                      onClick={() => handleOpenEdit(vehicle)}
+                      className="inline-flex items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                     >
-                      {vehicle.status}
-                    </span>
-                  </td>
-                  <td className="px-3 py-4">
-                    <div className="flex items-center justify-center gap-3">
-                      <Pencil
-                        onClick={() => handleOpenEdit(vehicle)}
-                        className="h-4 w-4 cursor-pointer text-indigo-500"
-                      />
-                      <Trash2
-                        onClick={() => handleOpenDelete(vehicle.id)}
-                        className="h-4 w-4 cursor-pointer text-red-500"
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <Pencil className="h-4 w-4 text-indigo-500" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Xóa phương tiện ${vehicle.type}`}
+                      onClick={() => handleOpenDelete(vehicle.id)}
+                      className="inline-flex items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

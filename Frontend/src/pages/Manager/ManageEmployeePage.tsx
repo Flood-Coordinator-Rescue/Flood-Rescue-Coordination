@@ -121,8 +121,10 @@ export const ManageEmployeePage = () => {
       return;
     }
 
+    const nextId = Math.max(...employees.map((employee) => employee.id), 0) + 1;
+
     const nextEmployee: Employee = {
-      id: employees.length + 1,
+      id: nextId,
       fullName: form.fullName.trim(),
       phone: form.phone.trim(),
       role: form.role as EmployeeRole,
@@ -135,7 +137,10 @@ export const ManageEmployeePage = () => {
   };
 
   const handleEditEmployee = () => {
-    if (editingEmployeeId === null || !form.role) {
+    const trimmedFullName = form.fullName.trim();
+    const trimmedPhone = form.phone.trim();
+
+    if (editingEmployeeId === null || !form.role || !trimmedFullName || !trimmedPhone) {
       return;
     }
 
@@ -144,8 +149,8 @@ export const ManageEmployeePage = () => {
         employee.id === editingEmployeeId
           ? {
               ...employee,
-              fullName: form.fullName.trim(),
-              phone: form.phone.trim(),
+              fullName: trimmedFullName,
+              phone: trimmedPhone,
               role: form.role as EmployeeRole,
             }
           : employee
@@ -204,8 +209,14 @@ export const ManageEmployeePage = () => {
 
               <div className="grid gap-4 py-2 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-700">Tên của bạn</p>
+                  <label
+                    htmlFor="employee-full-name"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Tên của bạn
+                  </label>
                   <Input
+                    id="employee-full-name"
                     value={form.fullName}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, fullName: e.target.value }))
@@ -215,14 +226,22 @@ export const ManageEmployeePage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-700">Vai trò</p>
+                  <label
+                    htmlFor="employee-role"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Vai trò
+                  </label>
                   <Select
                     value={form.role}
                     onValueChange={(value) =>
                       setForm((prev) => ({ ...prev, role: value as RoleKey }))
                     }
                   >
-                    <SelectTrigger className="w-full rounded-none border-0 border-b border-slate-400 px-0 shadow-none focus:ring-0">
+                    <SelectTrigger
+                      id="employee-role"
+                      className="w-full rounded-none border-0 border-b border-slate-400 px-0 shadow-none focus:ring-0"
+                    >
                       <SelectValue placeholder="Chọn vai trò" />
                     </SelectTrigger>
                     <SelectContent>
@@ -234,8 +253,14 @@ export const ManageEmployeePage = () => {
                 </div>
 
                 <div className="space-y-2 sm:col-span-2">
-                  <p className="text-sm font-medium text-slate-700">Số điện thoại</p>
+                  <label
+                    htmlFor="employee-phone"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Số điện thoại
+                  </label>
                   <Input
+                    id="employee-phone"
                     value={form.phone}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, phone: e.target.value }))
@@ -316,14 +341,22 @@ export const ManageEmployeePage = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-3">
-                      <Pencil
+                      <button
+                        type="button"
+                        aria-label={`Sửa nhân viên ${employee.fullName}`}
                         onClick={() => handleOpenEdit(employee)}
-                        className="h-4 w-4 cursor-pointer text-indigo-500"
-                      />
-                      <Trash2
+                        className="inline-flex cursor-pointer items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                      >
+                        <Pencil className="h-4 w-4 cursor-pointer text-indigo-500" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Xóa nhân viên ${employee.fullName}`}
                         onClick={() => handleOpenDeleteConfirm(employee.id)}
-                        className="h-4 w-4 cursor-pointer text-red-500"
-                      />
+                        className="inline-flex cursor-pointer items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                      >
+                        <Trash2 className="h-4 w-4 cursor-pointer text-red-500" />
+                      </button>
                     </div>
                   </td>
                 </tr>
