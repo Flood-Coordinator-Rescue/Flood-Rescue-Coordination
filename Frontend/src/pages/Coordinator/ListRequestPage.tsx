@@ -99,16 +99,6 @@ export default function ListRequestPage() {
   );
 }
 
-/**
- * Render status filter buttons and manage the selected filter state.
- *
- * The component displays buttons for each request status and toggles the active filter:
- * selecting a status sets it as the filter; selecting the already-active status clears the filter.
- *
- * @param filter - Current active status filter (one of "accept", "reject", "processing", "delayed", "completed", or an empty string)
- * @param setFilter - State setter that updates the active filter; called with the new status or an empty string to clear
- * @returns A React element containing the status filter buttons
- */
 export function Filters({
   filter,
   setFilter,
@@ -191,12 +181,6 @@ export function Filters({
   );
 }
 
-/**
- * Renders a paginated table of rescue requests filtered by the provided status and allows opening a request's detail view.
- *
- * @param filter - Status filter value used to limit the displayed requests (e.g., "accept", "reject", "processing", "delayed", "completed"). An empty string shows all requests.
- * @returns A React element containing the requests table, pagination controls, and interactive rows that navigate to the request detail route when clicked.
- */
 export function Requests({ filter }: { filter: string }) {
   const { pageNumber, pageSize, totalPage, requestList, handlePageChange } =
     useRequestList(filter);
@@ -272,12 +256,6 @@ export function Requests({ filter }: { filter: string }) {
   );
 }
 
-/**
- * Render a colored badge representing a rescue request's status.
- *
- * @param status - Status key; one of: "accept", "reject", "processing", "delayed", "completed"
- * @returns A JSX `span` element containing the localized status label, styled with colors that correspond to the provided `status`
- */
 export function Status({ status }: { status: string }) {
   switch (status) {
     case "accept":

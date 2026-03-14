@@ -121,11 +121,6 @@ export default function RequestDetailPage() {
   );
 }
 
-/**
- * Layout container that renders the request information panel and a mini map side-by-side.
- *
- * @returns A JSX.Element rendering the information panel and the mini map arranged horizontally.
- */
 export function Solving() {
   return (
     <div
@@ -138,11 +133,6 @@ export function Solving() {
   );
 }
 
-/**
- * Renders the request information panel with controls to view and update urgency, select a vehicle type, assign a rescue team, and display requester details, location, description, and attachments.
- *
- * @returns The component's JSX element containing request details, urgency and vehicle selectors, rescue-team selector, and conditional action buttons when the request is not completed.
- */
 export function Information() {
   const [vehicle, setVehicle] = useState<string | null>(null);
   const [urgency, setUrgency] = useState<string | null>(null);
